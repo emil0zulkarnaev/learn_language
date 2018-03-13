@@ -1,8 +1,10 @@
-hi - ������
-northern-��������
-hop-���
-tt-tt
-tt-ttsadf
-ttasdfasd-ttsadfsadfasdfas
-ttasdfasdsdfadsfasdf-ttsadfsadfasdfasasdfasdfasdf
-ttasdfasdsdfadsfasdfasdfasdfasdf-ttsadfsadfasdfasasdfasdfasdfasdfasdfasdf
+hi-привет
+around-вокруг
+around-около
+kernel-ядро
+typical-типичный
+packaged-упакованный
+packaged-в упаковке
+defining-определяющий
+both-оба
+both-и то и другое

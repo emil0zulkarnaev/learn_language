@@ -5,10 +5,12 @@ from tkinter import *
 from tkinter import ttk
 import random
 
-class Application(Frame):
+class Application(Toplevel):
     def __init__(self, master):
         super(Application, self).__init__(master)
         self.mr_master = master
+        self.title("Потестируемся))")
+        self.geometry("400x240")
         self.grid()
         self.create_widgets()
 
@@ -17,10 +19,10 @@ class Application(Frame):
 
         self.ind_word = 0
 
-        self.lab1 = Label(self.mr_master, text="Выберите верный перевод слова:")
+        self.lab1 = Label(self, text="Выберите верный перевод слова:")
         self.lab1.place(x=10, y=10)
 
-        self.lab2 = Label(self.mr_master, text=self.list_first_words[0].capitalize())
+        self.lab2 = Label(self, text=self.list_first_words[0].capitalize())
         self.lab2.place(x=10, y=30)
         self.lab2.config(font=10)
 
@@ -39,14 +41,14 @@ class Application(Frame):
         print(some_list[self.right_variant])
         print(self.right_variant, rnd_int)
         for i in range(4):
-            self.radiobuttons.append(Radiobutton(self.mr_master, variable=self.var, value=value, text=some_list[k],
+            self.radiobuttons.append(Radiobutton(self, variable=self.var, value=value, text=some_list[k],
                                                  command=self.create_radio_button))
             k += 1
             self.radiobuttons[len(self.radiobuttons)-1].place(x=10, y=crd)
             crd += 30
             value += 1
 
-        self.button1 = Button(self.mr_master, text="Дальше")
+        self.button1 = Button(self, text="Дальше")
         self.button1.place(x=30, y=190, width=150)
         self.button1['command'] = self.next_question
 
@@ -65,7 +67,7 @@ class Application(Frame):
                 self.radiobuttons[i].config(text=some_list[k])
                 k += 1
         else:
-            self.mr_master.destroy()
+            self.destroy()
 
 
     def create_radio_button(self):
@@ -84,7 +86,7 @@ class Application(Frame):
         try:
             f = open("./tests/" + f_text + ".txt", 'r')
         except:
-            self.mr_master.destroy()
+            self.destroy()
         else:
             f_text = f.read() + "\n"
             f.close()

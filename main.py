@@ -73,11 +73,7 @@ class Application(Frame):
 
     def find_test(self):
         import findTest
-        some = Tk()
-        some.title("Выберите тест")
-        some.geometry("160x115")
-        pp = findTest.Application(some)
-        some.mainloop()
+        pp = findTest.Application(self)
 
     def make_test(self):
         name_test = self.text4.get().lower().lstrip().rstrip()
