@@ -59,7 +59,6 @@ class Word:
         if not stop:
             #_id = [_id[0], _id[1]] if self.cf['_word'] == 'russian' else [_id[1], _id[0]]
             _sql = "INSERT INTO translation ("+self.cf['_word']+","+self.cf['_translate']+") VALUES ('"+str(_id[self.cf['_word']])+"','"+str(_id[self.cf['_translate']])+"')"
-            print(_sql)
             cursor = conn.cursor()
             cursor.execute(_sql)
             conn.commit()
