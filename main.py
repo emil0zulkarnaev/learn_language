@@ -1,10 +1,14 @@
 #!/usr/bin/python3
+#-*- coding:utf-8 -*-
 
 from tkinter import *
 from tkinter import ttk
 import sqlite3
 import string
+from Word import Word
 
+ABV_english = string.ascii_lowercase
+ABV_russian = ['а','б','в','г','д','е','ё','ж','з','и','й','к','л','м','н','о','п','р','с','т','у','ф','х','ц','ч','ш','щ','ъ','ы','ь','э','ю','я']
 
 class Application(Frame):
     def __init__(self, master):
@@ -130,64 +134,15 @@ class Application(Frame):
 
     def find_word(self):
         word = self.text1.get().lower().lstrip().rstrip()
-        con = sqlite3.connect('words.db')
-        cur = con.cursor()
-        eng = False
 
-        if len(word) != 0 and word[0] in string.ascii_lowercase:
-            eng = True
-        elif len(word) == 0:
-            return 0
+        _word = Word()
+        result = _word._translate(word)
 
-        sql = "SELECT * FROM words WHERE word LIKE '%"+word+"%'"
-        try:
-            cur.execute(sql)
-        except sqlite3.DatabaseError as err:
-            self.text3.delete(0.0, END)
-            self.text3.insert(0.0, "Подходящих слов нет\n\n ПОРА БЫ ИХ ДОБАВИТЬ!!!")
-            print("Ошибка: ", err)
+        if result:
+            self.text3.insert(0.0, result)
         else:
-            self.text3.delete(0.0, END)
-            message = word.upper() + "------------------\n"
-            text = "" 
-            for id_t, name in cur:
-                cur2 = con.cursor()
-                sql = "SELECT * FROM translate WHERE word1='" + str(id_t) + "' OR word2='" + str(id_t) + "'"
-                cur2.execute(sql)
-                for id_t, word1, word2 in cur2:
-                    cur3_1 = con.cursor()
-                    cur3_2 = con.cursor()
-                    sql1 = "SELECT word FROM words WHERE id='" + str(word1) + "'"
-                    sql2 = "SELECT word FROM words WHERE id='" + str(word2) + "'"
-                    cur3_1.execute(sql1)
-                    cur3_2.execute(sql2)
-                    word1 = cur3_1.fetchone()[0]
-                    word2 = cur3_2.fetchone()[0]
-                    
-                    if word1[0] in string.ascii_lowercase:
-                        if eng:
-                            text = word1 + " - " + word2
-                        else:
-                            text = word2 + " - " + word1
-                    else:
-                        if eng:
-                            text = word2 + " - " + word1
-                        else:
-                            text = word1 + " - " + word2 
-                    message = message + text + "\n"
-
-                    cur3_1.close()
-                    cur3_2.close()
-    
-                cur2.close()
-            cur.close()
-            if text == "":
-                message = message + "Подходящих слов нет\n\nПОРА БЫ ИХ ДОБАВИТЬ!!!"
-                self.text3.insert(0.0, message)
-                con.close()
-                return 0
+            message = "Подходящих слов нет\n\nПОРА БЫ ИХ ДОБАВИТЬ!!!"
             self.text3.insert(0.0, message)
-            con.close()
 
     def new_word(self):
         word1 = self.text1.get().lower().lstrip().rstrip()
@@ -196,94 +151,25 @@ class Application(Frame):
         if len(word1) == 0 or len(word2) == 0:
             self.text2.insert(0.0, "Зполните все поля")
             return 0
+        elif (word1[0] in ABV_english and word2[0] in ABV_english) or (word1[0] in ABV_russian and word2[0] in ABV_russian):
+            self.text3.delete(0.0, END)
+            self.text3.insert(0.0, "Так ниизяяя, подумайте дважды")
         else:
-
-            may_work = False
-            word1_bool = False
-            word2_bool = False
-
-            con = sqlite3.connect('words.db')
-
-            sql1 = "SELECT * FROM words WHERE word='"+word1+"'"
-            sql2 = "SELECT * FROM words WHERE word='"+word2+"'"
-            cur_1 = con.cursor()
-            cur_2 = con.cursor()
+            languages = ['russian', 'english'] if word1[0] in ABV_russian else ['english', 'russian']
             
-            cur_1.execute(sql1)
-            cur_2.execute(sql2)
-            
-            try:
-                id_1 = cur_1.fetchone()[0]
-                id_2 = cur_2.fetchone()[0]
-            except:
-                may_work = True
-                cur_1.close()
-                cur_2.close()
+            word = Word(word=languages[0], translate=languages[1])
+            result = word.set(word1, word2)
+
+            if result == -1:
+                self.text3.delete(0.0, END)
+                self.text3.insert(0.0, "Такой вид перевода уже имеется")
             else:
-                cur_1.close()
-                cur_2.close()
-
-                cur_3 = con.cursor()
-                sql = "SELECT * FROM translate WHERE (word1='"+str(id_1)+"' AND word2='"+str(id_2)+"') OR (word1='"+str(id_2)+"' AND word2='"+str(id_1)+"')"
-                cur_3.execute(sql)
-                try:
-                    id_3 = cur_3.fetchone()[0]
-                except:
-                    cur_3.close()
-                    may_work = True
-                else:
-                    self.text3.delete(0.0, END)
-                    self.text3.insert(0.0, "Такой вид перевода уже имеется")
-                    cur_3.close()
-                    con.close()
-                    return 0
-
-            if may_work:
-                #print("можем работать!")
-                arr = [
-                        (word1,),
-                        (word2,)
-                        ]
-                sql = "INSERT INTO words(word) VALUES(?)"
-                st = word1 + "-" + word2 + "\n"
-                f = open('new_words.txt', 'a')
-                f.write(st)
-                f.close()
-            
-                con.close()
-                con = sqlite3.connect('words.db')
-                cur = con.cursor()
-                cur.executemany(sql, arr)
-                con.commit()
-                cur.close()
-
-                cur = con.cursor()
-                sql = "SELECT id FROM words"
-                cur.execute(sql)
-                id_cr = 0
-                id_pr = 0
-                cnt = 0
-                for id_t in cur:
-                    cnt += 1
-                cnt2 = 0 
-                cur.execute(sql)
-                for id_t in cur:
-                    cnt2 += 1
-                    if cnt - 1 == cnt2:
-                        id_pr = id_t[0]
-                    id_cr = id_t[0]
-
-                sql = "INSERT INTO translate(word1, word2) VALUES(?,?)"
-                idd = (id_pr, id_cr)
-                cur.execute(sql, idd)
-                con.commit()
-                cur.close()
-                con.close()
+                file = open('new_words.txt', 'a')
+                file.write(word1+'-'+word2+'\n')
+                file.close()
                 
                 self.text3.delete(0.0, END)
                 self.text3.insert(0.0, "Перевод записан!")
-            else:
-                return 0
 
 
 
