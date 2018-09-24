@@ -6,6 +6,7 @@ from tkinter import ttk
 import sqlite3
 import string
 from Word import Word
+from international import Languages
 
 ABV_english = string.ascii_lowercase
 ABV_russian = ['а','б','в','г','д','е','ё','ж','з','и','й','к','л','м','н','о','п','р','с','т','у','ф','х','ц','ч','ш','щ','ъ','ы','ь','э','ю','я']
@@ -13,49 +14,62 @@ ABV_russian = ['а','б','в','г','д','е','ё','ж','з','и','й','к','л',
 class Application(Frame):
     def __init__(self, master):
         super(Application, self).__init__(master)
+
         self.grid()
         self.create_widgets()
+        self.grid()
+
+        self.Language = ['Eng', 'Rus']
+        self.nLanguage = 0
+        self.doInternational()
 
     def create_widgets(self):
-        self.but1 = Button(root, text="Добавить",)
+        self.but1 = Button(root)
         self.but1.place(x=0, y=55, width=100)
         self.but1['command'] = self.new_word
 
-        self.but2 = Button(root, text="Перевести")
+        self.but2 = Button(root)
         self.but2.place(x=100, y=55, width=100)
         self.but2['command'] = self.find_word
 
-        self.but4 = Button(root, text="Закончить!")
+        self.but4 = Button(root)
         self.but4.place(x=25, y=180, width=150)
         self.but4['command'] = self.the_end_write_word
 
-        self.but5 = Button(root, text="Отчистить всё...")
+        self.but5 = Button(root)
         self.but5.place(x=25, y=210, width=150)
         self.but5['command'] = self.remove_all
 
         
-        self.but6 = Button(root, text="Обнулить слова")
+        self.but6 = Button(root)
         self.but6.place(x=25, y=280, width=150)
         self.but6['command'] = self.remove_new_words
 
-        self.but6d1 = Button(root, text="Создать тест")
+        self.but6d1 = Button(root)
         self.but6d1.place(x=25, y=370, width=150)
         self.but6d1['command'] = self.make_test
 
-        self.but6d2 = Button(root, text="Выбрать тест")
+        self.but6d2 = Button(root)
         self.but6d2.place(x=25, y=400, width=150)
         self.but6d2['command'] = self.find_test
 
-        self.lab1 = Label(root, text="Слово для перевода:")
+        self.butInternational = Button(root)
+        self.butInternational.place(x=400, y=400, width=50)
+        self.butInternational['command'] = self.doInternational
+
+        self.labInternational = Label(root, text="Чтобы сменить язык, нажмите =>")
+        self.labInternational.place(x=200, y=400)
+
+        self.lab1 = Label(root)
         self.lab1.place(x=10, y=5)
 
-        self.lab2 = Label(root, text="Перевод:")
+        self.lab2 = Label(root)
         self.lab2.place(x=10, y=90)
 
-        self.lab3 = Label(root, text="Слова для изучения и повторения:")
+        self.lab3 = Label(root)
         self.lab3.place(x=200, y=0)
 
-        self.lab4 = Label(root, text="Введите название теста")
+        self.lab4 = Label(root)
         self.lab4.place(x=10, y=320)
 
         self.text1 = Entry(root)
@@ -75,9 +89,25 @@ class Application(Frame):
         self.scrollbar['command'] = self.text3.yview        #привязка скроллбара к текстовому полю
         self.text3['yscrollcommand'] = self.scrollbar.set   #привязка текстового поля к скроллбару
 
+    def doInternational(self):
+        lang = self.Language[self.nLanguage]
+        self.butInternational['text'] = lang
+        
+        lg = Languages[lang]
+        for i in lg:
+            try:
+                self.__dict__[i]['text']= lg[i]
+            except:
+                pass
+                #print('Не вышло для ', lg[i])
+
+        ind = self.Language.index(lang)
+        self.nLanguage = ind+1 if self.nLanguage < len(self.Language)-1 else 0
+            
+
     def find_test(self):
         import findTest
-        pp = findTest.Application(self)
+        pp = findTest.Application(self, self.nLanguage-1)
 
     def make_test(self):
         name_test = self.text4.get().lower().lstrip().rstrip()

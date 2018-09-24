@@ -3,15 +3,21 @@
 
 from tkinter import *
 from tkinter import ttk
+from international import Languages
 
 class Application(Toplevel):
-    def __init__(self, master):
+    def __init__(self, master, language=0):
         super(Application, self).__init__(master)
         self.mr_master = master
         self.title("Выберите тест")
         self.geometry("160x115")
         self.grid()
         self.create_widgets()
+
+        self.Language = ['Eng', 'Rus']
+        self.nLanguage = language
+        self.doInternational()
+        print('!!!!!!!!!!!', language)
 
     def create_widgets(self):
         self.list_test = self.make_list_test()
@@ -30,6 +36,17 @@ class Application(Toplevel):
         self.button2.place(x=5, y=80, width=150)
         self.button2['command'] = self.so_close
 
+    def doInternational(self):
+        lang = self.Language[self.nLanguage]
+        
+        lg = Languages[lang]
+        for i in lg:
+            try:
+                self.__dict__[i]['text']= lg[i]
+            except:
+                pass
+                #print('Не вышло для ', lg[i])
+
     def so_close(self):
         self.destroy()
 
@@ -41,7 +58,7 @@ class Application(Toplevel):
             f.close()
 
             import test
-            pp = test.Application(self.mr_master)
+            pp = test.Application(self.mr_master, self.nLanguage)
 
         else:
             self.destroy()

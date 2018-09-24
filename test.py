@@ -4,9 +4,10 @@
 from tkinter import *
 from tkinter import ttk
 import random
+from international import Languages
 
 class Application(Toplevel):
-    def __init__(self, master):
+    def __init__(self, master, language=0):
         super(Application, self).__init__(master)
         self.mr_master = master
         self.title("Потестируемся))")
@@ -14,17 +15,21 @@ class Application(Toplevel):
         self.grid()
         self.create_widgets()
 
+        self.Language = ['Eng', 'Rus']
+        self.nLanguage = language
+        self.doInternational()
+
     def create_widgets(self):
         self.create_words_list()
 
         self.ind_word = 0
 
-        self.lab1 = Label(self, text="Выберите верный перевод слова:")
-        self.lab1.place(x=10, y=10)
+        self.label1 = Label(self, text="Выберите верный перевод слова:")
+        self.label1.place(x=10, y=10)
 
-        self.lab2 = Label(self, text=self.list_first_words[0].capitalize())
-        self.lab2.place(x=10, y=30)
-        self.lab2.config(font=10)
+        self.label2 = Label(self, text=self.list_first_words[0].capitalize())
+        self.label2.place(x=10, y=30)
+        self.label2.config(font=10)
 
         self.var = IntVar()
         self.radiobuttons = []
@@ -52,11 +57,22 @@ class Application(Toplevel):
         self.button1.place(x=30, y=190, width=150)
         self.button1['command'] = self.next_question
 
+    def doInternational(self):
+        lang = self.Language[self.nLanguage]
+        
+        lg = Languages[lang]
+        for i in lg:
+            try:
+                self.__dict__[i]['text']= lg[i]
+            except:
+                pass
+                #print('Не вышло для ', lg[i])
+
     def next_question(self):
         if self.ind_word < len(self.list_first_words) - 1:
             self.ind_word += 1
 
-            self.lab2.config(text=self.list_first_words[self.ind_word].capitalize())
+            self.label2.config(text=self.list_first_words[self.ind_word].capitalize())
 
             k = 0
             some_list = self.random_some()
@@ -74,9 +90,9 @@ class Application(Toplevel):
         ind_variant = int(self.var.get()) - 1
         # print(ind_variant, self.right_variant)
         if self.right_variant == ind_variant:
-            self.lab2.config(text=self.list_first_words[self.ind_word].capitalize() + "   !!!Верно!!!")
+            self.label2.config(text=self.list_first_words[self.ind_word].capitalize() + "   !!!Верно!!!")
         else:
-            self.lab2.config(text=self.list_first_words[self.ind_word].capitalize() + "   ...Не верно =(")
+            self.label2.config(text=self.list_first_words[self.ind_word].capitalize() + "   ...Не верно =(")
 
     def create_words_list(self):
         f = open('ftest.txt', 'r')
