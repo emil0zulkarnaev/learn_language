@@ -17,7 +17,6 @@ class Application(Toplevel):
         self.Language = ['Eng', 'Rus']
         self.nLanguage = language
         self.doInternational()
-        print('!!!!!!!!!!!', language)
 
     def create_widgets(self):
         self.list_test = self.make_list_test()
@@ -34,7 +33,7 @@ class Application(Toplevel):
 
         self.button2 = Button(self, text="Отмена")
         self.button2.place(x=5, y=80, width=150)
-        self.button2['command'] = self.so_close
+        self.button2['command'] = self.on_closing
 
     def doInternational(self):
         lang = self.Language[self.nLanguage]
@@ -47,7 +46,9 @@ class Application(Toplevel):
                 pass
                 #print('Не вышло для ', lg[i])
 
-    def so_close(self):
+    def on_closing(self):
+        print('close findTest')
+        self.mr_master._findTest = False
         self.destroy()
 
     def pick_test(self):
@@ -59,6 +60,7 @@ class Application(Toplevel):
 
             import test
             pp = test.Application(self.mr_master, self.nLanguage)
+            self.mr_master.test = True
 
         else:
             self.destroy()

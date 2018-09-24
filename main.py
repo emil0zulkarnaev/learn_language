@@ -3,7 +3,6 @@
 
 from tkinter import *
 from tkinter import ttk
-import sqlite3
 import string
 from Word import Word
 from international import Languages
@@ -15,6 +14,8 @@ class Application(Frame):
     def __init__(self, master):
         super(Application, self).__init__(master)
 
+        self.preparation()
+
         self.grid()
         self.create_widgets()
         self.grid()
@@ -23,6 +24,51 @@ class Application(Frame):
         self.nLanguage = 0
         self.doInternational()
 
+    def preparation(self):
+        import os
+        lst = os.listdir('./')
+        if 'tests' not in lst:
+            os.makedirs('./tests')
+            
+        ### Make SQLite3 db
+        if 'words.db' not in lst:
+            import sqlite3
+            conn = sqlite3.connect('words.db')
+            
+            _strM = []
+            _strM.append("""
+CREATE TABLE english (
+    id   INTEGER PRIMARY KEY AUTOINCREMENT
+                 UNIQUE
+                 NOT NULL,
+    word TEXT    UNIQUE
+                 NOT NULL
+);
+""")
+            _strM.append("""
+CREATE TABLE russian (
+    id   INTEGER PRIMARY KEY AUTOINCREMENT
+                 UNIQUE
+                 NOT NULL,
+    word TEXT    UNIQUE
+                 NOT NULL
+);
+""")
+            _strM.append("""
+CREATE TABLE translation (
+    id      INTEGER PRIMARY KEY AUTOINCREMENT
+                    UNIQUE
+                    NOT NULL,
+    russian INTEGER NOT NULL,
+    english INTEGER NOT NULL
+);
+""")
+            for i in _strM:
+                cursor = conn.cursor()
+                cursor.execute(i)
+                conn.commit
+            conn.close()
+    
     def create_widgets(self):
         self.but1 = Button(root)
         self.but1.place(x=0, y=55, width=100)
